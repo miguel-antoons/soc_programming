@@ -1,25 +1,50 @@
 #include "fractal_fxpt.h"
+#include <stdint.h>
+#include <stdio.h>
 #include <swap.h>
+
+const fxpt TWO = 0x2 << FRACTIONAL_BITS;
+const fxpt FOUR = 0x4 << FRACTIONAL_BITS;
+
+inline fxpt float_to_fixed(float x) {
+    return (fxpt)(x * FRACTIONAL_SHIFT);
+}
+
+inline fxpt int_to_fixed(int x) {
+    return x << FRACTIONAL_BITS;
+}
+
+inline float fixed_to_float(fxpt x) {
+    return ((float)x) / FRACTIONAL_SHIFT;
+}
+
+inline fxpt fxpt_mul(fxpt x, fxpt y) {
+    return (fxpt)((x * y) >> FRACTIONAL_BITS);
+}
+
+inline fxpt fxpt_div(fxpt x, fxpt y) {
+    return (fxpt)((x << FRACTIONAL_BITS) / y);
+}
 
 //! \brief  Mandelbrot fractal point calculation function
 //! \param  cx    x-coordinate
 //! \param  cy    y-coordinate
 //! \param  n_max maximum number of iterations
 //! \return       number of performed iterations at coordinate (cx, cy)
-uint16_t calc_mandelbrot_point_soft(float cx, float cy, uint16_t n_max) {
-    float x = cx;
-    float y = cy;
+uint16_t calc_mandelbrot_point_soft(fxpt cx, fxpt cy, uint16_t n_max) {
+    fxpt x = cx;
+    fxpt y = cy;
     uint16_t n = 0;
-    float xx, yy, two_xy;
+    fxpt xx, yy, two_xy;
     do {
-        xx = x * x;
-        yy = y * y;
-        two_xy = 2 * x * y;
+        xx = fxpt_mul(x, x);
+        yy = fxpt_mul(y, y);
+        two_xy = fxpt_mul(fxpt_mul(TWO, x), y);
 
         x = xx - yy + cx;
         y = two_xy + cy;
         ++n;
-    } while (((xx + yy) < 4) && (n < n_max));
+    } while ((xx + yy < FOUR) && (n < n_max));
     return n;
 }
 
@@ -110,13 +135,13 @@ rgb565 iter_to_colour1(uint16_t iter, uint16_t n_max) {
 //! \param  cy_0   start y-coordinate
 //! \param  delta  increment for x- and y-coordinate
 //! \param  n_max  maximum number of iterations
-void draw_fractal(rgb565 *fbuf, int width, int height,
-                  calc_frac_point_p cfp_p, iter_to_colour_p i2c_p,
-                  float cx_0, float cy_0, float delta, uint16_t n_max) {
+void draw_fractal(rgb565 *fbuf, int width, int height, calc_frac_point_p cfp_p,
+                  iter_to_colour_p i2c_p, fxpt cx_0, fxpt cy_0,
+                  fxpt delta, uint16_t n_max) {
     rgb565 *pixel = fbuf;
-    float cy = cy_0;
+    fxpt cy = cy_0;
     for (int k = 0; k < height; ++k) {
-        float cx = cx_0;
+        fxpt cx = cx_0;
         for (int i = 0; i < width; ++i) {
             uint16_t n_iter = (*cfp_p)(cx, cy, n_max);
             rgb565 colour = (*i2c_p)(n_iter, n_max);
