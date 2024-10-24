@@ -1,8 +1,6 @@
 #include "fractal_myflpt.h"
 #include "swap.h"
 #include "vga.h"
-#include "cache.h"
-#include <stddef.h>
 #include <stdio.h>
 
 // Constants describing the output device
@@ -10,16 +8,17 @@ const int SCREEN_WIDTH = 512;   //!< screen width
 const int SCREEN_HEIGHT = 512;  //!< screen height
 
 // Constants describing the initial view port on the fractal function
-const float FRAC_WIDTH = 3.0; //!< default fractal width (3.0 in Q4.28)
-const float CX_0 = -2.0;      //!< default start x-coordinate (-2.0 in Q4.28)
-const float CY_0 = -1.5;      //!< default start y-coordinate (-1.5 in Q4.28)
+const myflpt32 FRAC_WIDTH = 0x40000080u; //!< default fractal width (3.0 in Q4.28)
+const myflpt32 CX_0 = 0x80000080u;      //!< default start x-coordinate (-2.0 in Q4.28)
+const myflpt32 CY_0 = 0xc000007fu;      //!< default start y-coordinate (-1.5 in Q4.28)
 const uint16_t N_MAX = 64;    //!< maximum number of iterations
 
 int main() {
     volatile unsigned int *vga = (unsigned int *) 0x50000020;
     volatile unsigned int reg, hi;
     rgb565 frameBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
-    float delta = FRAC_WIDTH / SCREEN_WIDTH;
+    myflpt32 delta = 0x40000077u;
+
     int i;
     vga_clear();
     printf("Starting drawing a fractal\n");
