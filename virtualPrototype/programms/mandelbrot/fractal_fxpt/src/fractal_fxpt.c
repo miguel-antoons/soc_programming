@@ -1,21 +1,12 @@
 #include "fractal_fxpt.h"
 #include <stdint.h>
-#include <stdio.h>
 #include <swap.h>
 
 const fxpt TWO = 0x2 << FRACTIONAL_BITS;
 const fxpt FOUR = 0x4 << FRACTIONAL_BITS;
 
-inline fxpt float_to_fixed(float x) {
-    return (fxpt)(x * FRACTIONAL_SHIFT);
-}
-
 inline fxpt int_to_fixed(int x) {
     return x << FRACTIONAL_BITS;
-}
-
-inline float fixed_to_float(fxpt x) {
-    return ((float)x) / FRACTIONAL_SHIFT;
 }
 
 inline fxpt fxpt_mul(fxpt x, fxpt y) {
