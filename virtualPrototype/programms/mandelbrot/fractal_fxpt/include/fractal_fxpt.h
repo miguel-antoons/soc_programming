@@ -5,7 +5,6 @@
 
 // implements a fixed point type Q19.13
 #define FRACTIONAL_BITS 13
-#define FRACTIONAL_SHIFT (1 << FRACTIONAL_BITS)
 typedef int32_t fxpt;
 fxpt int_to_fixed(int x);
 fxpt fxpt_mul(fxpt x, fxpt y);
