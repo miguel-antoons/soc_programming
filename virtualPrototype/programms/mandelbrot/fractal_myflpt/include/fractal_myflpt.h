@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 #include "myflpt.h"
+//typedef uint32_t myflpt32;
+//
+//#define EXPONENT_MASK 0x000000FFu
+//#define MANTISSA_MASK 0x7FFFFF00u
+//#define SIGN_MASK 0x80000000u
+//
+//#define MANTISSA_SHIFT 8
 
 //! Colour type (5-bit red, 6-bit green, 5-bit blue)
 typedef uint16_t rgb565;

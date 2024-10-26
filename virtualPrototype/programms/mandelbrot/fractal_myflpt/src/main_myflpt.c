@@ -2,6 +2,9 @@
 #include "swap.h"
 #include "vga.h"
 #include <stdio.h>
+#include "cache.h"
+// define OR1300
+#define OR1300
 
 // Constants describing the output device
 const int SCREEN_WIDTH = 512;   //!< screen width
