@@ -120,14 +120,10 @@ void draw_fractal(rgb565 *fbuf, int width, int height,
         float cx = cx_0;
         for (int i = 0; i < width; ++i) {
             uint16_t n_iter = (*cfp_p)(cx, cy, n_max);
-            if (n_iter != 1)
-                printf("i = %d, n_iter: %d\n", i, n_iter);
-//            if (i == 2) return;
             rgb565 colour = (*i2c_p)(n_iter, n_max);
             *(pixel++) = colour;
             cx += delta;
         }
-        return;
         cy += delta;
     }
 }

@@ -25,7 +25,7 @@ uint16_t calc_mandelbrot_point_soft(myflpt32 cx, myflpt32 cy, uint16_t n_max) {
 //        mantissa1 *= mantissa1;
 //        if (mantissa1 & 0x80000000) yy = (mantissa1 & MANTISSA_MASK) | ((y & EXPONENT_MASK) << 1) - 126;
 //        else                        yy = ((mantissa1 << 1) & MANTISSA_MASK) | ((y & EXPONENT_MASK) << 1) - 127;
-        two_xy = mul(x + 1, y);
+        two_xy = mul(x, y) + 1;
 
         x = add(sub(xx, yy), cx);
         y = add(two_xy, cy);

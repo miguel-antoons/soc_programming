@@ -3,7 +3,7 @@
 #include "vga.h"
 #include <stdio.h>
 #include "cache.h"
-// define OR1300
+
 #define OR1300
 
 // Constants describing the output device
@@ -17,6 +17,7 @@ const myflpt32 CY_0 = 0xc000007fu;      //!< default start y-coordinate (-1.5 in
 const uint16_t N_MAX = 64;    //!< maximum number of iterations
 
 int main() {
+    printf("Starting Custom Floating Point\n");
     volatile unsigned int *vga = (unsigned int *) 0x50000020;
     volatile unsigned int reg, hi;
     rgb565 frameBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
@@ -31,6 +32,7 @@ int main() {
     dcache_write_cfg( CACHE_FOUR_WAY | CACHE_SIZE_8K | CACHE_REPLACE_LRU | CACHE_WRITE_BACK );
     icache_enable(1);
     dcache_enable(1);
+    printf("Caches enabled\n");
 #endif
     /* Enable the vga-controller's graphic mode */
     vga[0] = swap_u32(SCREEN_WIDTH);
