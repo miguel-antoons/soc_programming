@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <swap.h>
 
-const fxpt TWO = 0x2 << FRACTIONAL_BITS;
 const fxpt FOUR = 0x4 << FRACTIONAL_BITS;
 
 inline fxpt int_to_fixed(int x) {
@@ -30,7 +29,7 @@ uint16_t calc_mandelbrot_point_soft(fxpt cx, fxpt cy, uint16_t n_max) {
     do {
         xx = fxpt_mul(x, x);
         yy = fxpt_mul(y, y);
-        two_xy = fxpt_mul(fxpt_mul(TWO, x), y);
+        two_xy = fxpt_mul(x << 1, y);
 
         x = xx - yy + cx;
         y = two_xy + cy;
