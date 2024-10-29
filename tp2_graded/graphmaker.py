@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 times = {
     'Base Floating Point': {'With Cache': 75, 'Without Cache': 2420},
     'Custom Floating Point': {'With Cache': 25, 'Without Cache': 804},
-    'Fixed Point': {'With Cache': 2, 'Without Cache': 59},
+    'Fixed Point': {'With Cache': 1.8, 'Without Cache': 54},
 }
 
 # plot a histogram
