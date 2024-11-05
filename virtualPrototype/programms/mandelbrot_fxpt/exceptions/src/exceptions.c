@@ -21,7 +21,7 @@ int main () {
    while (1) {
        perf_print_time(PERF_COUNTER_RUNTIME, "runtime");
        perf_print_cycles(PERF_COUNTER_RUNTIME, "runtime");
-       for (volatile int i = 0; i < 1000000; ++i) ;
+       for (volatile int i = 0; i < 1000000; ++i);
    }
    perf_stop();
 
