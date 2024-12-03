@@ -27,13 +27,13 @@ void init_dcache() {
 
 /**
  * @brief This functions moves the base address of the LED controller to LEDS_NEW_BASE.
- * 
+ *
  */
 void init_leds() {
     // note the endianness difference
     volatile uint32_t* baseaddr = (volatile uint32_t*)(LEDS_OLD_BASE + LEDS_BASEADDR_OFFSET);
     printf("original address: 0x%p\n", swap_u32(*baseaddr));
-    
+
     *baseaddr = swap_u32(LEDS_NEW_BASE);
 
     baseaddr = (volatile uint32_t*)(LEDS_NEW_BASE + LEDS_BASEADDR_OFFSET);
@@ -64,6 +64,7 @@ void bouncing_ball() {
         leds[index] = swap_u32(2);
         for (volatile long i = 0; i < 100000; i++)
             ;
+        dcache_flush();
     }
 }
 

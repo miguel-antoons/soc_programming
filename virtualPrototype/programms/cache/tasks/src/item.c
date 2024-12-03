@@ -64,7 +64,8 @@ void item_init(item_t* item, uint32_t id, const char* data) {
     item->id = id;
 
     if (data != NULL)
-        memcpy(item->data, data, ITEM_DATALEN);
-    else
-        memset(item->data, 0, ITEM_DATALEN);
+        // memcpy(item->data, data, ITEM_DATALEN);
+        item->data = data;
+    // else
+    //     memset(item->data, 0, ITEM_DATALEN);
 }
