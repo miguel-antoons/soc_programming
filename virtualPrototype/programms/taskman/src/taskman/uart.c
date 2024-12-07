@@ -104,8 +104,29 @@ static int can_resume(struct taskman_handler* handler, void* stack, void* arg) {
     // I strongly suggest that you first read `struct wait_data` definition.
     // Can resume if either (1) buffer is full, (2) found a new line character
     //
+    // ? which buffer must be full? uart_buffer or wait_data->buffer?
     // Note: that we need to put a '\0' at the end of the line.
     // Note: do not write the new line character
+
+    if (uart_buffer_empty(uart_buffer)) {
+        return 0;
+    }
+
+    size_t i = 0;
+    while (!uart_buffer_empty(uart_buffer) && i < wait_data->buffer_capacity - 1) {
+        uint8_t ch = uart_buffer_pop(uart_buffer);
+        if (ch == '\n') {
+            wait_data->buffer[i] = '\0';
+            wait_data->length = i;
+            return 1;
+        }
+        wait_data->buffer[i] = ch;
+        i++;
+    }
+
+    wait_data->buffer[i] = '\0';
+    wait_data->length = i;
+    return 1;
 
 
     IMPLEMENT_ME;
@@ -119,7 +140,19 @@ static void loop(struct taskman_handler* handler) {
 
     // If available, read data from UART and put it to the UART buffer
     // You can discard data if the buffer is full.
+    // ? what do you mean with discard data?
     // see: support/src/uart.c for help.
+
+    if (uart_buffer_full(uart_buffer)) {
+        return;
+    }
+
+    uint8_t ch;
+    while ((ch = uart_getc(uart)) && uart_buffer_nonfull(uart_buffer)) {
+        if (uart_buffer_nonfull(uart_buffer)) {
+            uart_buffer_put(uart_buffer, ch);
+        }
+    }
 
 
     IMPLEMENT_ME;
