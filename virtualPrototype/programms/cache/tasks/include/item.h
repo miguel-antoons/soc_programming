@@ -20,7 +20,8 @@ struct item_t {
     unsigned id;
 
     /** @brief Item data. */
-    char data[ITEM_DATALEN];
+    // char data[ITEM_DATALEN];
+    const char* data;
 };
 
 /**
