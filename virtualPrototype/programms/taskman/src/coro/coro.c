@@ -29,7 +29,7 @@ struct coro_data {
 #include <stdio.h>
 
 /**
- * @brief Returns a pointer to the currently executed coro.
+ * @brief Returns a pointer to the currently executed coro. (pointer to start of stack)
  * @note R10 (Thread-local storage register) keeps a pointer to the current coro.
  *
  * @return struct coro_coro*
