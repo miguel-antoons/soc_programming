@@ -127,9 +127,6 @@ static int can_resume(struct taskman_handler* handler, void* stack, void* arg) {
     wait_data->buffer[i] = '\0';
     wait_data->length = i;
     return 1;
-
-
-    IMPLEMENT_ME;
 }
 
 static void loop(struct taskman_handler* handler) {
@@ -140,7 +137,6 @@ static void loop(struct taskman_handler* handler) {
 
     // If available, read data from UART and put it to the UART buffer
     // You can discard data if the buffer is full.
-    // ? what do you mean with discard data?
     // see: support/src/uart.c for help.
 
     if (uart_buffer_full(uart_buffer)) {
@@ -153,9 +149,6 @@ static void loop(struct taskman_handler* handler) {
             uart_buffer_put(uart_buffer, ch);
         }
     }
-
-
-    IMPLEMENT_ME;
 }
 
 void taskman_uart_glinit() {
