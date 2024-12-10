@@ -125,21 +125,18 @@ void taskman_loop() {
         for (int i = 0; i < taskman.handlers_count; i += 1) {
             taskman.handlers[i]->loop(NULL);
         }
-        printf("called all wait handler loop\n");
 
         // (b)
         for (int i = 0; i < taskman.tasks_count; i += 1) {
-            printf("loop: %d\n", i);
             void* coro_stack = taskman.tasks[i];
-            struct coro_data* data = (struct coro_data*)coro_stack;
 
             // * 1
             void* result;
-            if (!coro_completed(coro_stack, &result)) {
-                coro_resume(coro_stack);
+            if (coro_completed(coro_stack, &result)) {
+                // coro_resume(coro_stack);
                 continue;
             }
-            struct task_data* task = coro_data(data);
+            struct task_data* task = coro_data(coro_stack);
 
             // * 2
             if (task->wait.handler == NULL) {
@@ -147,13 +144,11 @@ void taskman_loop() {
                 continue;
             }
 
-            int can_resume = !task->wait.handler->can_resume(task->wait.handler, coro_stack, task->wait.arg);
+            int can_resume = task->wait.handler->can_resume(task->wait.handler, coro_stack, task->wait.arg);
             // * 3
             if (can_resume) {
-                printf("resume\n");
                 coro_resume(coro_stack);
             }
-            printf("i: %d, total: %d\n", i, taskman.tasks_count);
         }
     }
     printf("exit loop\n");
@@ -188,10 +183,10 @@ void taskman_wait(struct taskman_handler* handler, void* arg) {
     task_data->wait.arg = arg;
     if (should_yield) {
         // yield
-        printf("yield: %s\n", handler->name);
         coro_yield();
     } else {
-        printf("do not yield: %s\n", handler->name);
+        task_data->wait.handler = NULL;
+        task_data->wait.arg = NULL;
     }
 }
 

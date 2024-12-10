@@ -4,6 +4,7 @@
 #include <taskman/taskman.h>
 #include <taskman/uart.h>
 #include <uart.h>
+#include <stdio.h>
 
 #include <implement_me.h>
 
@@ -113,20 +114,23 @@ static int can_resume(struct taskman_handler* handler, void* stack, void* arg) {
     }
 
     size_t i = 0;
-    while (!uart_buffer_empty(uart_buffer) && i < wait_data->buffer_capacity - 1) {
+    while (!uart_buffer_empty(uart_buffer) && wait_data->length < wait_data->buffer_capacity - 1) {
         uint8_t ch = uart_buffer_pop(uart_buffer);
         if (ch == '\n') {
             wait_data->buffer[i] = '\0';
-            wait_data->length = i;
             return 1;
         }
         wait_data->buffer[i] = ch;
+        wait_data->length += 1;
         i++;
     }
 
-    wait_data->buffer[i] = '\0';
-    wait_data->length = i;
-    return 1;
+    if (i == wait_data->buffer_capacity - 1) {
+        wait_data->buffer[wait_data->length + 1] = '\0';
+        return 1;
+    }
+
+    return 0;
 }
 
 static void loop(struct taskman_handler* handler) {
@@ -139,16 +143,24 @@ static void loop(struct taskman_handler* handler) {
     // You can discard data if the buffer is full.
     // see: support/src/uart.c for help.
 
-    if (uart_buffer_full(uart_buffer)) {
-        return;
-    }
+    // if (uart_buffer_full(uart_buffer)) {
+    //     return;
+    // }
 
     uint8_t ch;
-    while ((ch = uart_getc(uart)) && uart_buffer_nonfull(uart_buffer)) {
-        if (uart_buffer_nonfull(uart_buffer)) {
-            uart_buffer_put(uart_buffer, ch);
+
+    // while ((ch = uart_getc(uart)) && uart_buffer_nonfull(uart_buffer)) {
+    // while ((uart[UART_LINE_STATUS_REGISTER] & UART_RX_AVAILABLE_MASK) == 0) {
+    if ((uart[UART_LINE_STATUS_REGISTER] & UART_RX_AVAILABLE_MASK)) {
+        if (uart_buffer_full(uart_buffer)) {
+            uart_buffer_pop(uart_buffer);
+            // uart_buffer_put(uart_buffer, ch);
         }
+        ch = uart_getc(uart);
+        printf("char: %c\n", ch);
+        uart_buffer_put(uart_buffer, ch);
     }
+    uart_handler.stack = NULL;
 }
 
 void taskman_uart_glinit() {
