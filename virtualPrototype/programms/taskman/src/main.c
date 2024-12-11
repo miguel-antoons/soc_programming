@@ -3,7 +3,7 @@
 
 void part1();
 void part2_1();
-// void part2_2();
+void part2_2();
 
 int main() {
     platform_glinit();
@@ -14,5 +14,5 @@ int main() {
 
     part1();
     part2_1();
-    // part2_2();
+    part2_2();
 }

@@ -143,21 +143,13 @@ static void loop(struct taskman_handler* handler) {
     // You can discard data if the buffer is full.
     // see: support/src/uart.c for help.
 
-    // if (uart_buffer_full(uart_buffer)) {
-    //     return;
-    // }
-
     uint8_t ch;
 
-    // while ((ch = uart_getc(uart)) && uart_buffer_nonfull(uart_buffer)) {
-    // while ((uart[UART_LINE_STATUS_REGISTER] & UART_RX_AVAILABLE_MASK) == 0) {
     if ((uart[UART_LINE_STATUS_REGISTER] & UART_RX_AVAILABLE_MASK)) {
         if (uart_buffer_full(uart_buffer)) {
             uart_buffer_pop(uart_buffer);
-            // uart_buffer_put(uart_buffer, ch);
         }
         ch = uart_getc(uart);
-        printf("char: %c\n", ch);
         uart_buffer_put(uart_buffer, ch);
     }
     uart_handler.stack = NULL;

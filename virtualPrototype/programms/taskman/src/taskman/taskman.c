@@ -94,17 +94,7 @@ void* taskman_spawn(coro_fn_t coro_fn, void* arg, size_t stack_sz) {
     // (2)
     coro_init(stack, stack_sz, coro_fn, arg);
 
-    // struct taskman_handler* handler = malloc(sizeof(struct taskman_handler));
-    // die_if_not(handler);
-
-    // struct taskman_handler* handler = (struct taskman_handler*) (&taskman.tasks[taskman.task_count]);
-    // handler->name = "TODO: change placeholder name";
-    // handler->on_wait = NULL;
-    // handler->can_resume = NULL;
-    // handler->loop = NULL;
-
     struct task_data* data = (struct task_data*)coro_data(stack);
-    // TODO: which handler to choose?
     data->wait.handler = NULL;
     data->wait.arg = arg;
 
@@ -123,24 +113,33 @@ void taskman_loop() {
 
         // (a)
         for (int i = 0; i < taskman.handlers_count; i += 1) {
+            // taskman.handlers[i]->loop(taskman.handlers[i]);
             taskman.handlers[i]->loop(NULL);
         }
 
         // (b)
         for (int i = 0; i < taskman.tasks_count; i += 1) {
             void* coro_stack = taskman.tasks[i];
-
             // * 1
             void* result;
+            TASKMAN_LOCK();
             if (coro_completed(coro_stack, &result)) {
-                // coro_resume(coro_stack);
                 continue;
             }
             struct task_data* task = coro_data(coro_stack);
+            if (task->running) {
+                TASKMAN_RELEASE();
+                continue;
+            }
+            task->running = 1;
+            TASKMAN_RELEASE();
 
             // * 2
             if (task->wait.handler == NULL) {
                 coro_resume(coro_stack);
+                TASKMAN_LOCK();
+                task->running = 0;
+                TASKMAN_RELEASE();
                 continue;
             }
 
@@ -149,6 +148,9 @@ void taskman_loop() {
             if (can_resume) {
                 coro_resume(coro_stack);
             }
+            TASKMAN_LOCK();
+            task->running = 0;
+            TASKMAN_RELEASE();
         }
     }
     printf("exit loop\n");
@@ -182,7 +184,6 @@ void taskman_wait(struct taskman_handler* handler, void* arg) {
     task_data->wait.handler = handler;
     task_data->wait.arg = arg;
     if (should_yield) {
-        // yield
         coro_yield();
     } else {
         task_data->wait.handler = NULL;
